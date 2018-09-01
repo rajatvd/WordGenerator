@@ -3,6 +3,8 @@ Run this script to train a character level decoder LSTM on the glove dataset
 """
 
 import torch
+torch.backends.cudnn.benchmark=True
+
 from torch import optim
 
 from sacred import Experiment
@@ -37,11 +39,13 @@ def make_dataloader(word2vec_file, charidx_file,
                     batch_size, num_workers, device):
     """Make the dataloader using the given paths to pickled files"""
     dset = WordsDataset(word2vec_file, charidx_file, device)
+    # pin = device!='cpu'
     loader = torch.utils.data.DataLoader(
         dset,
         batch_size=batch_size,
         num_workers=num_workers,
         shuffle=True,
+        # pin_memory=pin,
         collate_fn=collate_words_samples,
     )
 
