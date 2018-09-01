@@ -4,6 +4,9 @@ Helper script to preprocess glove word vector files
 import re
 import string
 import torch
+import os
+
+glove_file = 'glove.6B/glove.6B.50d.txt'
 
 from sacred  import Experiment
 
@@ -12,8 +15,14 @@ ex = Experiment(name="preprocess_glove_vectors")
 @ex.config
 def config():
     """Main config for data preprocessing"""
-    glove_file = 'glove.6B/glove.6B.50d.txt'
-    output_path = 'pickled_word_vecs/glove50d'
+
+    glove_file = 'glove.6B/glove.6B.50d.txt' # filename of glove file (.txt)
+    path, file = os.path.split(glove_file)
+    name, ext = os.path.splitext(file)
+    output_path = f'pickled_word_vecs/{name}' # output path for pickled files
+
+
+
     lowercase = True # whether to include lowercase letters
     uppercase = False # whether to include uppercase letters
     chars = '' # characters to add to lowercase, uppercase if included
