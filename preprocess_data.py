@@ -125,8 +125,9 @@ def pickle_word_vecs(output_path, word_vectors_dict, letters, _log):
 
     _log.info(f"Saved word vecs and mappings to {word_vec_file}")
 
-    char2idx = dict(zip(letters, range(len(letters))))
-    idx2char = dict(zip(range(len(letters)), letters))
+    chars = list(letters) + ['START', 'END']
+    char2idx = dict(zip(chars, range(len(chars))))
+    idx2char = dict(zip(range(len(chars)), chars))
     char_file = f"{output_path}_chars.pkl"
 
     torch.save((char2idx, idx2char), char_file)
