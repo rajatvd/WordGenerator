@@ -14,7 +14,7 @@ class WordsDataset(Dataset):
     Dataset of words and their word embeddings.
     Also stores indexed versions of the words using character mappings.
     """
-    def __init__(self, word2vec_file, charidx_file, device):
+    def __init__(self, word2vec_file, charidx_file, device='cpu'):
         """
         Requires two pickled files as inputs.
 
