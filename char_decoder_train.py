@@ -31,4 +31,4 @@ def train_on_batch(model, batch, optimizer):
     loss.backward()
     optimizer.step()
 
-    return loss,
+    return loss.cpu().detach().numpy(),
