@@ -1,9 +1,6 @@
 """Modules for building the char rnn"""
 
-import torch
 from torch import nn
-import torch.functional as F
-
 from pytorch_utils.wrapped_lstm import WrappedLSTM
 
 class CharDecoder(nn.Module):
@@ -36,6 +33,9 @@ class CharDecoder(nn.Module):
         return self.lstm(hidden, packed_input)
 
 
+# Demonstrate overfit on a batch:
+
+
 # from words_dataset import WordsDataset, collate_words_samples
 #
 # dataset = WordsDataset('pickled_word_vecs/glove.6B.50d_words.pkl',
@@ -49,10 +49,31 @@ class CharDecoder(nn.Module):
 #
 #
 # batch = next(iter(data_loader))
-# hidden = (batch['embeddings'], batch['embeddings'])
-# hidden[0].shape
-# packed_out, hid = test_model(hidden, batch['packed_input'])
-# packed_out
-# criterion = nn.CrossEntropyLoss()
+# # hidden = batch['embeddings'], batch['embeddings']
+# # a, b = test_model(hidden, batch['packed_input'])
+# # batch['packed_output'].data
+# from torch import optim
+# optimizer = optim.Adam(test_model.parameters())
 #
-# criterion(packed_out.data, batch['packed_output'].data)
+# from char_decoder_train import train_on_batch
+#
+# for i in range(1000):
+#     train_on_batch(test_model, batch, optimizer)
+#
+# train_on_batch(test_model, batch, optimizer)
+#
+# C=5
+# h0 = batch['embeddings'][0,C].unsqueeze(0).unsqueeze(0)
+# h0.shape
+# hid = h0,h0
+# t = torch.LongTensor([dataset.char2idx['START']])
+# inp = torch.nn.utils.rnn.pack_sequence([t])
+# out = ''
+# while True:
+#     pout, hid = test_model(hid,inp)
+#     next_idx = pout.data.argmax()
+#     inp = torch.nn.utils.rnn.pack_sequence([next_idx.unsqueeze(0)])
+#     if dataset.idx2char[next_idx.item()] == 'END':
+#         break
+#     out += dataset.idx2char[next_idx.item()]
+# out, batch['words'][C]
