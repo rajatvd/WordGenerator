@@ -105,6 +105,7 @@ def make_model(lstm_hidden_size, char_count, char_embedding_size, device, _log):
 def train_config():
     epochs = 100
     save_every = 1
+    start_epoch = 1
 
 
 @ex.automain
