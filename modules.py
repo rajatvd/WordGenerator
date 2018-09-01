@@ -8,9 +8,9 @@ class CharDecoder(nn.Module):
     Character level decoder LSTM to generate words from embeddings
     """
     def __init__(self,
-                 lstm_hidden_size,
-                 char_count,
-                 char_embedding_size,):
+                 lstm_hidden_size=50,
+                 char_count=28,
+                 char_embedding_size=50,):
         """
         lstm_hidden_size: hidden size of lstm, and also the embedding size of
             the words
