@@ -3,11 +3,9 @@ Helper script to preprocess glove word vector files
 """
 import re
 import string
-import torch
 import os
 
-glove_file = 'glove.6B/glove.6B.50d.txt'
-
+import torch
 from sacred  import Experiment
 
 ex = Experiment(name="preprocess_glove_vectors")
