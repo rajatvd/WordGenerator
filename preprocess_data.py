@@ -1,7 +1,8 @@
 """
 Helper script to preprocess glove word vector files
 """
-import re, string
+import re
+import string
 import torch
 
 from sacred  import Experiment
@@ -10,6 +11,7 @@ ex = Experiment(name="preprocess_glove_vectors")
 
 @ex.config
 def config():
+    """Main config for data preprocessing"""
     glove_file = 'glove.6B/glove.6B.50d.txt'
     output_path = 'pickled_word_vecs/glove50d'
     lowercase = True # whether to include lowercase letters
@@ -126,5 +128,6 @@ def pickle_word_vecs(output_path, word_vectors_dict, letters, _log):
 
 @ex.automain
 def main(glove_file, output_path, letters):
+    """Main function to preprocess data"""
     word_vectors_dict = load_glove_model(glove_file)
     pickle_word_vecs(output_path, word_vectors_dict, letters)
