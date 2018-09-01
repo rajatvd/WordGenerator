@@ -13,7 +13,7 @@ from pytorch_utils.updaters import averager
 
 
 from modules import CharDecoder
-from char_decoder_train import train_on_batch
+from training_functions import train_on_batch, create_scheduler_callback
 from words_dataset import collate_words_samples, WordsDataset
 
 torch.backends.cudnn.benchmark = True
@@ -65,6 +65,7 @@ def optimizer_config():
     lr = 0.001 # learning rate
     opt = 'adam' # type of optimzier
 
+
 @ex.capture
 def make_optimizer(model, lr, opt):
     """Make an optimizer of the given type (opt), for the given model's
@@ -78,6 +79,22 @@ def make_optimizer(model, lr, opt):
     optimizer = optimizers[opt](model.parameters(), lr=lr)
 
     return optimizer
+
+
+# -----------CALLBACK FOR LR SCHEDULING-------------
+
+@ex.config
+def scheduler_config():
+    """Config for lr scheduler"""
+    milestones = [50, 100]
+    gamma = 0.5
+
+@ex.capture
+def make_scheduler_callback(optimizer, milestones, gamma):
+    """Create a MultiStepLR scheduler callback for the optimizer
+    using the config"""
+    return create_scheduler_callback(optimizer, milestones, gamma)
+
 
 # -----------MODEL-------------
 
@@ -114,6 +131,7 @@ def main(_run):
     loader = make_dataloader()
     model = make_model()
     optimizer = make_optimizer(model)
+    callback = make_scheduler_callback(optimizer)
 
     st.loop(
         _run=_run,
@@ -122,6 +140,8 @@ def main(_run):
         save_dir=SAVE_DIR,
         trainOnBatch=train_on_batch,
         train_loader=loader,
+        callback=callback,
+        callback_metric_names=['learning_rate'],
         **_run.config,
         batch_metric_names=['loss'],
         updaters=[averager])
