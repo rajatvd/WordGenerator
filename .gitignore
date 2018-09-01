@@ -1,0 +1,4 @@
+__pycache__
+.ipynb_checkpoints
+glove.6B
+pickled_word_vecs
