@@ -3,8 +3,6 @@ Run this script to train a character level decoder LSTM on the glove dataset
 """
 
 import torch
-torch.backends.cudnn.benchmark=True
-
 from torch import optim
 
 from sacred import Experiment
@@ -17,6 +15,8 @@ from pytorch_utils.updaters import averager
 from modules import CharDecoder
 from char_decoder_train import train_on_batch
 from words_dataset import collate_words_samples, WordsDataset
+
+torch.backends.cudnn.benchmark = True
 
 ex = Experiment('characterlevel_decoder')
 SAVE_DIR = 'CharDecoderLSTM'
