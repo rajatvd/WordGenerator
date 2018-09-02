@@ -163,53 +163,78 @@ def main(_run):
 
 # from torch import nn
 #
-# def sample(rnn,sample,char2idx,idx2char):
+# def sample(rnn,sample,char2idx,idx2char, random_embed=False, sigma=0.1):
 #     with torch.no_grad():
 #         word = sample['word']
 #         indexed_word = sample['indexed_word']
-#         embedding = sample['embedding'].view(1,1,-1)
+#         embedding = sample['embedding'].view(1,-1)
 #
-#         hidden = embedding,embedding
+#         # print(embedding.sum())
+#         hidden = embedding
+#         # print(rnn.training)
+#         if random_embed:
+#             hidden = embedding + sigma*torch.randn_like(embedding)
 #
 #         idx = -1
 #         inp = [torch.LongTensor([char2idx['START']])]
 #         inp = nn.utils.rnn.pack_sequence(inp)
 #         word_out=''
+#
+#         out,hidden = rnn(hidden, inp, use_head=True)
+#
+#         pred = out.data.cpu().numpy().reshape(-1)
+#         #print(pred.shape)
+#         idx = np.argmax(pred)
+#         word_out += idx2char[idx]
+#         inp = [torch.LongTensor([idx])]
+#         inp = nn.utils.rnn.pack_sequence(inp)
+#
+#         max_len=30
+#         c=0
 #         while idx != char2idx['END']:
-#             out,hidden = rnn(hidden, inp)
+#             out,hidden = rnn(hidden, inp, use_head=False)
 #
 #
 #             pred = out.data.detach().cpu().numpy().reshape(-1)
 #             #print(pred.shape)
 #             idx = np.argmax(pred)
-#             if idx == char2idx['END']:
+#             if idx == char2idx['END'] or c>max_len:
 #                 return word_out
 #             word_out += idx2char[idx]
 #             inp = [torch.LongTensor([idx])]
 #             inp = nn.utils.rnn.pack_sequence(inp)
+#             c+=1
 #
 #
 #
 #
+# # %%
 #
+# # model_file = 'Z:\\UbuntuVMShared\\Notebooks\\CharRNN\\CharDec'+
+# # 'oderLSTM\\20\\epoch578_02-09_0917_learning_rate0.0001_loss1.6675.statedict.pkl'
+# model_file = 'CharDecoderLSTM\\23\\epoch524_02-09_2230_learning_rate0.0001_loss1.0834.statedict.pkl'
 #
 # word2vec_file = 'pickled_word_vecs/glove.6B.300d_words.pkl'
 # charidx_file = 'pickled_word_vecs/glove.6B.300d_chars.pkl'
 # device = 'cpu'
 #
-#
-# model = CharDecoder(300, 28,300).to('cpu')
-# model.load_state_dict(torch.load('Z:\\UbuntuVMShared\\Notebooks\\CharRNN\\CharDec'+
-# 'oderLSTM\\20\\epoch578_02-09_0917_learning_rate0.0001_loss1.6675.statedict.pkl'))
-#
+# # %%
+# model = CharDecoderHead(500, 28, 300, 300).to('cpu')
+# model.load_state_dict(torch.load(model_file))
+# model = model.eval();
 # import numpy as np
 # dataset = WordsDataset(word2vec_file, charidx_file, device)
 #
+# # %%
 # inds = np.random.choice(len(dataset), 30)
 # for i in inds:
 #     print(dataset[i]['word'],end='\t\t')
-#     print(sample(model,dataset[i],dataset.char2idx,dataset.idx2char))
-#
-# word = 'agility'
-# print(dataset[dataset.word2idx[word]]['word'])
-# print(sample(model,dataset[dataset.word2idx[word]],dataset.char2idx,dataset.idx2char))
+#     print(sample(model,dataset[i],dataset.char2idx,dataset.idx2char, random_embed=True))
+# # %%
+# word = 'superfluous'
+# print(word+":")
+# for i in range(10):
+#     print(sample(model,dataset[dataset.word2idx[word]],dataset.char2idx,dataset.idx2char, random_embed=True, sigma=0.1))
+
+
+
