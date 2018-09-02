@@ -4,7 +4,7 @@ Train on batch function for training a character level decoder lstm
 from torch import nn
 from torch import optim
 
-def train_on_batch(model, batch, optimizer):
+def train_on_batch(model, batch, optimizer, use_head=False):
     """
     Perform one train step on the CharDecoder model using the given optimizer
     and batch of data.
@@ -14,8 +14,13 @@ def train_on_batch(model, batch, optimizer):
     """
 
     # hidden state initialized as embedding
-    embeddings = batch['embeddings']
-    hidden = embeddings, embeddings
+    hidden = batch['embeddings']
+
+    # if not using head layer, directly pass embedding as hidden state
+    if use_head:
+        hidden = hidden.squeeze()
+    else:
+        hidden = hidden, hidden
 
     # input and target batches of sequences
     packed_input = batch['packed_input']
@@ -24,7 +29,7 @@ def train_on_batch(model, batch, optimizer):
     criterion = nn.CrossEntropyLoss()
 
     # forward pass
-    packed_output, hidden = model(hidden, packed_input)
+    packed_output, hidden = model(hidden, packed_input, use_head=use_head)
     loss = criterion(packed_output.data, packed_target.data)
 
     # backward and optimize
