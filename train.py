@@ -1,6 +1,7 @@
 """
 Run this script to train a character level decoder LSTM on the glove dataset
 """
+from functools import partial
 
 import torch
 from torch import optim
@@ -12,7 +13,7 @@ import pytorch_utils.sacred_trainer as st
 from pytorch_utils.updaters import averager
 
 
-from modules import CharDecoder
+from modules import CharDecoder, CharDecoderHead
 from training_functions import train_on_batch, create_scheduler_callback
 from words_dataset import collate_words_samples, WordsDataset
 
@@ -101,15 +102,26 @@ def make_scheduler_callback(optimizer, milestones, gamma):
 @ex.config
 def model_config():
     """Config for model"""
-    lstm_hidden_size = 300
+    lstm_hidden_size = 500
     char_count = 28
     char_embedding_size = 300
+    word_embedding_size = 300
+    embedding_to_hidden_activation = 'relu' # relu, tanh, sigmoid
 
 @ex.capture
-def make_model(lstm_hidden_size, char_count, char_embedding_size, device, _log):
+def make_model(lstm_hidden_size,
+               char_count,
+               char_embedding_size,
+               word_embedding_size,
+               embedding_to_hidden_activation,
+               device,
+               _log):
     """Create char decoder model from config"""
-    model = CharDecoder(lstm_hidden_size, char_count,
-        char_embedding_size).to(device)
+    model = CharDecoderHead(lstm_hidden_size,
+      char_count,
+      char_embedding_size,
+      input_embedding_size=word_embedding_size,
+      embedding_to_hidden_activation=embedding_to_hidden_activation).to(device)
 
     params = torch.nn.utils.parameters_to_vector(model.parameters())
     num_params = len(params)
@@ -138,7 +150,7 @@ def main(_run):
         model=model,
         optimizer=optimizer,
         save_dir=SAVE_DIR,
-        trainOnBatch=train_on_batch,
+        trainOnBatch=partial(train_on_batch, use_head=True),
         train_loader=loader,
         callback=callback,
         callback_metric_names=['learning_rate'],
