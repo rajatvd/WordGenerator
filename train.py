@@ -6,7 +6,7 @@ from functools import partial
 import torch
 from torch import optim
 
-from sacred import Experiment
+from sacred import Experiment, SETTINGS
 from sacred.observers import FileStorageObserver
 from visdom_observer.visdom_observer import VisdomObserver
 import pytorch_utils.sacred_trainer as st
@@ -18,6 +18,8 @@ from training_functions import train_on_batch, create_scheduler_callback
 from words_dataset import collate_words_samples, WordsDataset
 
 torch.backends.cudnn.benchmark = True
+
+SETTINGS.CAPTURE_MODE = 'no'
 
 ex = Experiment('characterlevel_decoder')
 SAVE_DIR = 'CharDecoderLSTM'
@@ -234,7 +236,16 @@ def main(_run):
 # word = 'superfluous'
 # print(word+":")
 # for i in range(10):
-#     print(sample(model,dataset[dataset.word2idx[word]],dataset.char2idx,dataset.idx2char, random_embed=True, sigma=0.1))
+#     print(sample(model,dataset[dataset.word2idx[word]],dataset.char2idx,dataset.idx2char, random_embed=True, sigma=1))
+
+
+
+
+
+
+
+
+
 
 
 
