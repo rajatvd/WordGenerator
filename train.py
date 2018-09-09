@@ -67,10 +67,11 @@ def optimizer_config():
     """
     lr = 0.001 # learning rate
     opt = 'adam' # type of optimzier
+    weight_decay = 0 # l2 regularization weight_decay (lambda)
 
 
 @ex.capture
-def make_optimizer(model, lr, opt):
+def make_optimizer(model, lr, opt, weight_decay):
     """Make an optimizer of the given type (opt), for the given model's
     parameters with the given learning rate (lr)"""
     optimizers = {
@@ -79,7 +80,8 @@ def make_optimizer(model, lr, opt):
         'rmsprop':optim.RMSprop,
     }
 
-    optimizer = optimizers[opt](model.parameters(), lr=lr)
+    optimizer = optimizers[opt](model.parameters(), lr=lr,
+                                weight_decay=weight_decay)
 
     return optimizer
 
@@ -172,10 +174,10 @@ def main(_run):
 #         embedding = sample['embedding'].view(1,-1)
 #
 #         # print(embedding.sum())
-#         hidden = embedding
+#         hidden = embedding + sigma*torch.randn_like(embedding)
 #         # print(rnn.training)
 #         if random_embed:
-#             hidden = embedding + sigma*torch.randn_like(embedding)
+#             hidden = sigma*torch.randn_like(embedding)
 #
 #         idx = -1
 #         inp = [torch.LongTensor([char2idx['START']])]
@@ -214,14 +216,15 @@ def main(_run):
 #
 # # model_file = 'Z:\\UbuntuVMShared\\Notebooks\\CharRNN\\CharDec'+
 # # 'oderLSTM\\20\\epoch578_02-09_0917_learning_rate0.0001_loss1.6675.statedict.pkl'
-# model_file = 'CharDecoderLSTM\\23\\epoch524_02-09_2230_learning_rate0.0001_loss1.0834.statedict.pkl'
+# # model_file = 'CharDecoderLSTM\\23\\epoch524_02-09_2230_learning_rate0.0001_loss1.0834.statedict.pkl'
+# model_file = 'CharDecoderLSTM\\35\\epoch481_07-09_1407_learning_rate0.0000_loss0.0117.statedict.pkl'
 #
 # word2vec_file = 'pickled_word_vecs/glove.6B.300d_words.pkl'
 # charidx_file = 'pickled_word_vecs/glove.6B.300d_chars.pkl'
 # device = 'cpu'
 #
 # # %%
-# model = CharDecoderHead(500, 28, 300, 300).to('cpu')
+# model = CharDecoderHead(1024, 28, 300, 300).to('cpu')
 # model.load_state_dict(torch.load(model_file))
 # model = model.eval();
 # import numpy as np
@@ -231,12 +234,14 @@ def main(_run):
 # inds = np.random.choice(len(dataset), 30)
 # for i in inds:
 #     print(dataset[i]['word'],end='\t\t')
-#     print(sample(model,dataset[i],dataset.char2idx,dataset.idx2char, random_embed=True))
+#     print(sample(model,dataset[i],dataset.char2idx,dataset.idx2char, sigma=0))
 # # %%
-# word = 'superfluous'
+# word = 'constitution'
 # print(word+":")
 # for i in range(10):
-#     print(sample(model,dataset[dataset.word2idx[word]],dataset.char2idx,dataset.idx2char, random_embed=True, sigma=1))
+#     print(sample(model,dataset[dataset.word2idx[word]],dataset.char2idx,dataset.idx2char,
+#     random_embed=True, sigma=1))
+
 
 
 
