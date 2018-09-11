@@ -65,6 +65,8 @@ class WordsDataset(Dataset):
         indexed_word: torch LongTensor contained indices of each char in the word
         embedding: torch Tensor which is the embedding of the word
         """
+        # print(idx)
+        idx = int(idx)
         sample = {'word':self.idx2word[idx],
                   'indexed_word':self.indexed_words[idx],
                   'embedding':self.embed[idx]}
