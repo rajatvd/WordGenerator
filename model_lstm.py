@@ -35,6 +35,6 @@ def make_model(lstm_hidden_size,
 
     params = torch.nn.utils.parameters_to_vector(model.parameters())
     num_params = len(params)
-    _log.info(f"Created char decoder head lstm model with {num_params} parameters"
-    +f"on {device}")
+    _log.info(f"Created char decoder head lstm model with {num_params} parameters \
+    on {device}")
     return model
