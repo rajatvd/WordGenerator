@@ -16,7 +16,7 @@ from model_lstm import model_ingredient, make_model
 from dataset import data_ingredient, make_dataloaders
 
 
-from training_functions import train_on_batch, create_scheduler_callback
+from training_functions import train_on_batch, create_val_scheduler_callback
 from words_dataset import collate_words_samples, WordsDataset
 
 torch.backends.cudnn.benchmark = True
@@ -73,7 +73,7 @@ def scheduler_config():
 def make_scheduler_callback(optimizer, milestones, gamma):
     """Create a MultiStepLR scheduler callback for the optimizer
     using the config"""
-    return create_scheduler_callback(optimizer, milestones, gamma)
+    return create_val_scheduler_callback(optimizer, milestones, gamma)
 
 
 @ex.config
@@ -99,8 +99,9 @@ def main(_run):
                   save_dir=SAVE_DIR,
                   trainOnBatch=partial(train_on_batch, use_head=True),
                   train_loader=train,
+                  val_loader=val,
                   callback=callback,
-                  callback_metric_names=['learning_rate'],
+                  callback_metric_names=['val_loss', 'learning_rate'],
                   batch_metric_names=['loss'],
                   updaters=[averager])})
 
