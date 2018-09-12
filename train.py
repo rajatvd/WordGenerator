@@ -17,7 +17,6 @@ from dataset import data_ingredient, make_dataloaders
 
 
 from training_functions import train_on_batch, create_val_scheduler_callback
-from words_dataset import collate_words_samples, WordsDataset
 
 torch.backends.cudnn.benchmark = True
 
