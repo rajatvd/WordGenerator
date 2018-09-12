@@ -21,7 +21,10 @@ def data_config():
 @data_ingredient.capture
 def make_dataloaders(word2vec_file, charidx_file,
                      batch_size, num_workers, val_split, device, _log):
-    """Make the dataloader using the given paths to pickled files"""
+    """Make the dataloader using the given paths to pickled files
+
+    Returns (WordsDataset, train_loader, val_loader)
+    """
     dset = WordsDataset(word2vec_file, charidx_file, device)
 
     _log.info("Loaded dataset")
@@ -54,4 +57,4 @@ def make_dataloaders(word2vec_file, charidx_file,
         collate_fn=collate_words_samples,)
 
 
-    return train_loader, val_loader
+    return dset, train_loader, val_loader

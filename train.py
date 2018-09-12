@@ -85,7 +85,7 @@ def train_config():
 @ex.automain
 def main(_run):
 
-    train, val = make_dataloaders()
+    dset, train, val = make_dataloaders()
     model = make_model()
     optimizer = make_optimizer(model)
     callback = make_scheduler_callback(optimizer)
