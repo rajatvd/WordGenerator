@@ -2,6 +2,7 @@
 
 import torch
 from torch import nn
+import numpy as np
 
 import torch.nn.utils.rnn as p
 pack = p.pack_sequence
@@ -27,7 +28,7 @@ def sample_beam(model, input_embedding, char2idx, idx2char, k=5, maxlen=30):
         out, hidden = model(input_embedding, inp, use_head=True)
 
         out = softmax(out.data).view(-1).cpu().numpy()
-        max_k = argsort(out)[-k:][::-1]
+        max_k = np.argsort(out)[-k:][::-1]
         oldprobs = out[max_k]
         words = [[i] for i in max_k]
         inp = pack([torch.LongTensor([j]).to(device) for j in max_k])
@@ -43,7 +44,7 @@ def sample_beam(model, input_embedding, char2idx, idx2char, k=5, maxlen=30):
 
             #print(out.shape)
             inpnp = inp.data.detach().cpu().numpy()
-            done = where(inpnp == char2idx['END'])
+            done = np.where(inpnp == char2idx['END'])
             out[done] = 0
             if len(out[done]) != 0:
                 #print(out[done].shape)
@@ -54,13 +55,13 @@ def sample_beam(model, input_embedding, char2idx, idx2char, k=5, maxlen=30):
             #print(out)
             #print(out[done])
             out = (oldprobs.reshape(-1, 1)*out)
-            max_k = argsort(out)[:, -k:][:, ::-1]
+            max_k = np.argsort(out)[:, -k:][:, ::-1]
 
             #print(max_k)
-            probs = array([out[i][max_k[i]] for i in range(k)])
+            probs = np.array([out[i][max_k[i]] for i in range(k)])
             #print(probs)
             flat = probs.reshape(-1)
-            max_k2 = argsort(flat)[::-1][:k]
+            max_k2 = np.argsort(flat)[::-1][:k]
             word_inds = max_k2//k
             next_chars_inds = max_k2%k
 
