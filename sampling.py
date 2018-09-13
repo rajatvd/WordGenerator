@@ -6,7 +6,7 @@ from sacred import Experiment
 import torch
 from beam_search import sample_beam
 
-from model_lstm import make_model
+from model import make_model
 from dataset import make_dataloaders
 
 # %%
@@ -75,7 +75,7 @@ ex = Experiment('sampling')
 @ex.config
 def input_config():
     """Parameters for sampling using the given model"""
-    run_dir = 'CharDecoderLSTM\\52'
+    run_dir = 'CharDecoderRNN\\2'
     epoch = 'latest'
     beam_size = 20 # currently should be < 28
     sigma = 1 # sigma of gaussian noise to add to embedding
@@ -114,7 +114,7 @@ def main(run_dir, epoch, beam_size, max_len, word, sigma,
 
 # # %%
 # from IPython.display import display, Markdown
-# run_dir = 'CharDecoderLSTM\\24'
+# run_dir = 'CharDecoderRNN\\2'
 # epoch = 'latest'
 # beam_size = 10 # currently should be < 28
 # sigma = 1 # sigma of gaussian noise to add to embedding
@@ -122,7 +122,7 @@ def main(run_dir, epoch, beam_size, max_len, word, sigma,
 # max_len = 30 # maximum length of a sampled word
 # num_samples = 10 # number of times to sample
 # print_probabs = False # whether to print beam search probabilities
-# device = 'cuda'
+# device = 'cpu'
 #
 # def dummy():
 #     pass
@@ -134,7 +134,7 @@ def main(run_dir, epoch, beam_size, max_len, word, sigma,
 # path = get_model_path(run_dir, epoch)
 # model.load_state_dict(torch.load(path))
 # model = model.eval()
-# 
+#
 # # %%
 # dset, train_loader, val_loader = make_dataloaders(**{**config['dataset'],
 # 'device':device}, _log=dummy)
