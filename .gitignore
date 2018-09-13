@@ -3,4 +3,5 @@ __pycache__
 glove.6B
 pickled_word_vecs
 CharDecoderLSTM
+CharDecoderRNN
 lstm
