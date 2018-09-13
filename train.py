@@ -22,7 +22,7 @@ torch.backends.cudnn.benchmark = True
 
 SETTINGS.CAPTURE_MODE = 'no'
 
-ex = Experiment('characterlevel_decoder',
+ex = Experiment('characterlevel_decoder_rnn',
                 ingredients=[model_ingredient, data_ingredient])
 SAVE_DIR = 'CharDecoderRNN'
 ex.observers.append(FileStorageObserver.create(SAVE_DIR))
