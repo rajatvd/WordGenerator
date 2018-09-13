@@ -12,7 +12,7 @@ from visdom_observer.visdom_observer import VisdomObserver
 import pytorch_utils.sacred_trainer as st
 from pytorch_utils.updaters import averager
 
-from model_lstm import model_ingredient, make_model
+from model import model_ingredient, make_model
 from dataset import data_ingredient, make_dataloaders
 
 
@@ -24,7 +24,7 @@ SETTINGS.CAPTURE_MODE = 'no'
 
 ex = Experiment('characterlevel_decoder',
                 ingredients=[model_ingredient, data_ingredient])
-SAVE_DIR = 'CharDecoderLSTM'
+SAVE_DIR = 'CharDecoderRNN'
 ex.observers.append(FileStorageObserver.create(SAVE_DIR))
 ex.observers.append(VisdomObserver())
 
