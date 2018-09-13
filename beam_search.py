@@ -77,7 +77,7 @@ def sample_beam(model, input_embedding, char2idx, idx2char, k=5, maxlen=30):
                     WORDS.append((words[word_ind], oldprobs[i]))
                     #the_word = words[word_ind]
                     #return ''.join([idx2char[i] for i in the_word])
-                new_inp.append(torch.LongTensor([next_char]).cuda())
+                new_inp.append(torch.LongTensor([next_char]).to(device))
                 word = words[word_ind][:]
                 word = word + [next_char]
                 new_words.append(word)
