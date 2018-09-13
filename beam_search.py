@@ -33,10 +33,12 @@ def sample_beam(model, input_embedding, char2idx, idx2char, k=5, maxlen=30):
         words = [[i] for i in max_k]
         inp = pack([torch.LongTensor([j]).to(device) for j in max_k])
 
-        hidden0 = torch.cat([hidden[0] for i in range(k)], dim=1)
-        hidden1 = torch.cat([hidden[1] for i in range(k)], dim=1)
-
-        hidden = hidden0, hidden1
+        if model.mode == 'LSTM':
+            hidden0 = torch.cat([hidden[0] for i in range(k)], dim=1)
+            hidden1 = torch.cat([hidden[1] for i in range(k)], dim=1)
+            hidden = hidden0, hidden1
+        else:
+            hidden = torch.cat([hidden for i in range(k)], dim=1)
         WORDS = []
         for c in range(maxlen):
             out, hidden = model(hidden, inp, use_head=False)
@@ -83,10 +85,13 @@ def sample_beam(model, input_embedding, char2idx, idx2char, k=5, maxlen=30):
                 new_words.append(word)
             words = new_words[:]
 
+            if model.mode == 'LSTM':
+                h1, h2 = hidden
+                h1, h2 = h1[0][word_inds].view(1, k, -1), h2[0][word_inds].view(1, k, -1)
+                hidden = h1, h2
+            else:
+                hidden = hidden[0][word_inds].view(1, k, -1)
 
-            h1, h2 = hidden
-            h1, h2 = h1[0][word_inds].view(1, k, -1), h2[0][word_inds].view(1, k, -1)
-            hidden = h1, h2
 
             inp = pack(new_inp)
 
