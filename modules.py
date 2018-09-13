@@ -1,36 +1,39 @@
 """Modules for building the char rnn"""
 
 from torch import nn
-from pytorch_utils.wrapped_lstm import WrappedLSTM
+from pytorch_utils.wrapped_rnn import WrappedRNN
 
-class CharDecoder(nn.Module):
+class CharDecoderRNN(nn.Module):
     """
-    Character level decoder LSTM to generate words from embeddings
+    Character level decoder rnn to generate words from embeddings
     """
     def __init__(self,
-                 lstm_hidden_size=50,
+                 mode='GRU',
+                 hidden_size=50,
                  char_count=28,
-                 char_embedding_size=50,):
+                 char_embedding_size=50,
+                 **kwargs):
         """
-        lstm_hidden_size: hidden size of lstm, and also the embedding size of
-            the words
+        hidden_size: hidden size of rnn
         char_count: number of characters
-        char_embedding_size: also equal to lstm_input_size
+        char_embedding_size: also equal to input_size of rnn
         """
         super().__init__()
 
         self.input_module = nn.Embedding(num_embeddings=char_count,
                                          embedding_dim=char_embedding_size)
-        self.output_module = nn.Linear(lstm_hidden_size, char_count, bias=True)
+        self.output_module = nn.Linear(hidden_size, char_count, bias=True)
 
-        self.lstm = WrappedLSTM(char_embedding_size,
-                                lstm_hidden_size,
-                                input_module=self.input_module,
-                                output_module=self.output_module,
-                                num_layers=1)
+        self.rnn = WrappedRNN(mode,
+                              char_embedding_size,
+                              hidden_size,
+                              input_module=self.input_module,
+                              output_module=self.output_module,
+                              num_layers=1,
+                              **kwargs)
 
     def forward(self, hidden, packed_input):
-        return self.lstm(hidden, packed_input)
+        return self.rnn(hidden, packed_input)
 
 # %%
 ACTS = {
@@ -38,10 +41,9 @@ ACTS = {
     'sigmoid':nn.Sigmoid,
     'tanh':nn.Tanh,}
 
-
-class CharDecoderHead(nn.Module):
+class CharDecoderHeadRNN(nn.Module):
     """
-    Character level decoder LSTM to generate words from embeddings, with an
+    Character level decoder to generate words from embeddings, with an
     additional fully connected layer from word embedding to hidden state.
 
     This module can be called with an optional use_head boolean to first pass
@@ -52,39 +54,44 @@ class CharDecoderHead(nn.Module):
     """
 
     def __init__(self,
-                 lstm_hidden_size=50,
+                 mode='GRU',
+                 hidden_size=50,
                  char_count=28,
                  char_embedding_size=50,
                  input_embedding_size=50,
-                 embedding_to_hidden_activation='relu'):
+                 embedding_to_hidden_activation='relu',
+                 **kwargs):
         """
-        lstm_hidden_size: hidden size of lstm
+        hidden_size: hidden size of rnn
         char_count: number of characters
-        char_embedding_size: also equal to lstm_input_size
+        char_embedding_size: also equal to input_size of rnn
         input_embedding_size: the size of word embeddings. A fully connected
             layer from input_embedding_size -> lstm_hidden_size is used to
             create the initial lstm hidden state from a word embedding
+        kwargs: additional kwargs which are passed into WrappedRNN
         """
         super().__init__()
 
-        self.decoder = CharDecoder(lstm_hidden_size,
-                                   char_count,
-                                   char_embedding_size)
+        self.mode = mode
+        self.decoder = CharDecoderRNN(self.mode,
+                                      hidden_size,
+                                      char_count,
+                                      char_embedding_size)
 
         self.embedding_to_hidden = nn.Sequential(
-            nn.Linear(input_embedding_size, lstm_hidden_size),
+            nn.Linear(input_embedding_size, hidden_size),
             ACTS[embedding_to_hidden_activation](),
-            nn.BatchNorm1d(lstm_hidden_size),
+            nn.BatchNorm1d(hidden_size),
         )
 
     def forward(self, hidden, packed_input, use_head=True):
         """use_head=True will treat hidden as a word embedding,
         while use_head=False will pass it directly into decoder"""
         if use_head:
-            h = self.embedding_to_hidden(hidden).unsqueeze(0)
-            hidden = h, h
+            hidden = self.embedding_to_hidden(hidden).unsqueeze(0)
+            if self.mode == 'LSTM':
+                hidden = hidden, hidden
         return self.decoder(hidden, packed_input)
-
 
 # Demonstrate overfit on a batch:
 
@@ -96,7 +103,7 @@ class CharDecoderHead(nn.Module):
 #             'pickled_word_vecs/glove.6B.50d_chars.pkl','cpu')
 #
 #
-# test_model = CharDecoderHead(100, len(dataset.char2idx.keys()), 20)
+# test_model = CharDecoderHeadRNN('GRU', 100, len(dataset.char2idx.keys()), 20)
 #
 # data_loader = torch.utils.data.DataLoader(dataset, batch_size=32, shuffle=True,
 #     collate_fn=collate_words_samples)
@@ -141,4 +148,4 @@ class CharDecoderHead(nn.Module):
 #     out += dataset.idx2char[next_idx.item()]
 # out, batch['words'][C]
 #
-
+#
