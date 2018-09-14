@@ -80,7 +80,7 @@ def train_config():
     epochs = 100
     save_every = 1
     start_epoch = 1
-    sigma = 0
+    sigma = 0 # noise to add to embedding before feeding to model
 
 
 @ex.automain
