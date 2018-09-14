@@ -108,7 +108,7 @@ def main(run_dir, epoch, beam_size, max_len, word, sigma,
     samples, probabs = sample(model, config, word, 0, dset, char2idx, idx2char,
                               beam_size, max_len, device, print_probabs)
     print(" ".join(samples))
-    print()
+    print(f"Word: {word}, sigma={sigma}\n\n")
     for i in range(num_samples):
         samples, probabs = sample(model, config, word, sigma, dset, char2idx, idx2char,
                                   beam_size, max_len, device, print_probabs)
