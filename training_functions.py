@@ -5,10 +5,12 @@ import torch
 from torch import nn
 from torch import optim
 
-def train_on_batch(model, batch, optimizer, use_head=False):
+def train_on_batch(model, batch, optimizer, use_head=False, sigma=0):
     """
     Perform one train step on the CharDecoder model using the given optimizer
     and batch of data.
+
+    Adds `sigma` gaussian noise to the embedding before passing to model
 
     Metrics returned:
     loss
@@ -16,6 +18,8 @@ def train_on_batch(model, batch, optimizer, use_head=False):
 
     # hidden state initialized as embedding
     hidden = batch['embeddings']
+
+    hidden = hidden + sigma*torch.randn_like(hidden)
 
     # if not using head layer, directly pass embedding as hidden state
     if use_head:

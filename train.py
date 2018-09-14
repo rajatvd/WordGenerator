@@ -80,10 +80,11 @@ def train_config():
     epochs = 100
     save_every = 1
     start_epoch = 1
+    sigma = 0
 
 
 @ex.automain
-def main(_run):
+def main(_run, sigma):
 
     dset, train, val = make_dataloaders()
     model = make_model()
@@ -96,7 +97,9 @@ def main(_run):
                   model=model,
                   optimizer=optimizer,
                   save_dir=SAVE_DIR,
-                  trainOnBatch=partial(train_on_batch, use_head=True),
+                  trainOnBatch=partial(train_on_batch,
+                                       use_head=True,
+                                       sigma=sigma),
                   train_loader=train,
                   val_loader=val,
                   callback=callback,
