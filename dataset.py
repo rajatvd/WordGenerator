@@ -25,7 +25,7 @@ def make_dataloaders(word2vec_file, charidx_file,
 
     Returns (WordsDataset, train_loader, val_loader)
     """
-    dset = WordsDataset(word2vec_file, charidx_file, device)
+    dset = WordsDataset(word2vec_file, charidx_file, device, _log)
 
     _log.info("Loaded dataset")
 

@@ -4,7 +4,7 @@ word vectors in a tensor and word to index maps and inverse maps.
 
 Also requires a file which stores character level index maps.
 """
-
+import logging
 import torch
 import torch.nn as nn
 from torch.utils.data import Dataset
@@ -14,7 +14,8 @@ class WordsDataset(Dataset):
     Dataset of words and their word embeddings.
     Also stores indexed versions of the words using character mappings.
     """
-    def __init__(self, word2vec_file, charidx_file, device='cpu'):
+    def __init__(self, word2vec_file, charidx_file, device='cpu',
+                 _log=logging.getLogger('words_dataset')):
         """
         Requires two pickled files as inputs.
 
@@ -34,10 +35,10 @@ class WordsDataset(Dataset):
         self.word2idx, self.idx2word, self.embed = torch.load(word2vec_file)
         self.embed = self.embed.to(device)
         self.embed.requires_grad = False
-        print(f"Loaded word2vec to {device}")
+        _log.info(f"Loaded word2vec to {device}")
 
         self.char2idx, self.idx2char = torch.load(charidx_file)
-        print("Loaded char2idx")
+        _log.info("Loaded char2idx")
 
 
         self.indexed_words = []
@@ -53,7 +54,7 @@ class WordsDataset(Dataset):
 
             self.indexed_words.append(indexed_word)
 
-        print(f"Loaded indexed words to {device}")
+        _log.info(f"Loaded {len(self.indexed_words)} indexed words to {device}")
 
     def __len__(self):
         return len(self.word2idx.keys())
