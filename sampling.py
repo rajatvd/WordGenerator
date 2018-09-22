@@ -4,7 +4,7 @@ import os
 import json
 from sacred import Experiment
 import torch
-from beam_search import sample_beam
+from beam_search import sample_beam, pass_word
 
 from model import make_model
 from dataset import make_dataloaders
@@ -51,13 +51,25 @@ def get_embedding(config, word, sigma, device='cpu', dset=None):
         return embedding + perturbation
 
 def sample(model, config, word, sigma, dset, char2idx, idx2char,
-           beam_size, max_len, device, print_probabs=False):
+           beam_size, max_len, device, print_probabs=False, start='START',
+           use_head=True):
     """Perform sampling using the given model and config.
     If word is the integer 0, a random embedding is used."""
     input_embedding = get_embedding(config, word, sigma, device, dset)
+    use_head = False
+    if start != 'START' and len(start)>1:
+        out, input_embedding = pass_word(start[:-1], model, input_embedding, char2idx, device)
+        start_c = start[-1]
+        # print(start_c, start[:-1])
+    else:
+        start_c = start
+        use_head=True
     samples, probabs = sample_beam(model, input_embedding, char2idx, idx2char,
-                                   k=beam_size, maxlen=max_len)
+                                   use_head=use_head,
+                                   k=beam_size, maxlen=max_len, start=start_c)
 
+    if start != 'START':
+        samples = [start+s for s in samples]
 
     if print_probabs:
         if word != 0:
@@ -75,19 +87,20 @@ ex = Experiment('sampling')
 @ex.config
 def input_config():
     """Parameters for sampling using the given model"""
-    run_dir = 'CharDecoderRNN\\2'
+    run_dir = 'trained_model'
     epoch = 'latest'
     beam_size = 20 # currently should be < 28
-    sigma = 1 # sigma of gaussian noise to add to embedding
+    sigma = 0.5 # sigma of gaussian noise to add to embedding
     word = 0 # input word embedding to use. if equal to integer 0, a random embedding will be used
     max_len = 30 # maximum length of a sampled word
     num_samples = 10 # number of times to sample
     print_probabs = False # whether to print beam search probabilities
+    start = 'START' # all sampled words will start with this
     device = 'cpu'
 
 @ex.automain
 def main(run_dir, epoch, beam_size, max_len, word, sigma,
-         device, num_samples, print_probabs, _log):
+         device, num_samples, print_probabs, _log, start):
 
     config = read_config(run_dir)
     _log.info(f"Read config from {run_dir}")
@@ -106,12 +119,12 @@ def main(run_dir, epoch, beam_size, max_len, word, sigma,
 
     print("sigma = 0:")
     samples, probabs = sample(model, config, word, 0, dset, char2idx, idx2char,
-                              beam_size, max_len, device, print_probabs)
+                              beam_size, max_len, device, print_probabs, start=start)
     print(" ".join(samples))
     print(f"Word: {word}, sigma={sigma}")
     for i in range(num_samples):
         samples, probabs = sample(model, config, word, sigma, dset, char2idx, idx2char,
-                                  beam_size, max_len, device, print_probabs)
+                                  beam_size, max_len, device, print_probabs, start=start)
         print(" ".join(samples))
         print()
 

@@ -7,7 +7,8 @@ import numpy as np
 import torch.nn.utils.rnn as p
 pack = p.pack_sequence
 
-def sample_beam(model, input_embedding, char2idx, idx2char, k=5, maxlen=30):
+def sample_beam(model, input_embedding, char2idx, idx2char, k=5, maxlen=30,
+                start='START', use_head=True):
     """Sample using beam search
     model: model to be used. It must have a head layer (or a use_head option in
         forward)
@@ -17,15 +18,19 @@ def sample_beam(model, input_embedding, char2idx, idx2char, k=5, maxlen=30):
     idx2char: dict which maps one hot indices to characters
     k: size of the beam
     maxlen: maximum length of a sampled word
+    start: which character to start with
+    use_head: whether to pass the input_embedding through the head layer for the
+        first beam expansion
     """
     with torch.no_grad():
-        softmax = nn.Softmax(dim=1)
-        input_embedding = input_embedding.view(1, -1)
         device = input_embedding.device
+        softmax = nn.Softmax(dim=1)
+        if use_head:
+            input_embedding = input_embedding.view(1, -1)
 
-        inp = [torch.LongTensor([char2idx['START']]).to(device)]
+        inp = [torch.LongTensor([char2idx[start]]).to(device)]
         inp = nn.utils.rnn.pack_sequence(inp)
-        out, hidden = model(input_embedding, inp, use_head=True)
+        out, hidden = model(input_embedding, inp, use_head=use_head)
 
         out = softmax(out.data).view(-1).cpu().numpy()
         max_k = np.argsort(out)[-k:][::-1]
@@ -96,6 +101,15 @@ def sample_beam(model, input_embedding, char2idx, idx2char, k=5, maxlen=30):
             inp = pack(new_inp)
 
         return [''.join([idx2char[i] for i in word if i != char2idx['END']]) for word in words], oldprobs
+
+
+def pass_word(word, model, input_embedding, char2idx, device, use_head=True):
+    """Pass a word through the given model using the input_embedding,
+    Returns the final output and hidden state"""
+    inp = torch.LongTensor([char2idx['START']] + [char2idx[c] for c in word]).to(device)
+    inp = pack([inp])
+    out, hidden = model(input_embedding.unsqueeze(0), inp, use_head=use_head)
+    return out, hidden
 
 # %%
 # import json
