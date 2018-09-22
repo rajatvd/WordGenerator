@@ -51,19 +51,26 @@ def get_embedding(config, word, sigma, device='cpu', dset=None):
         return embedding + perturbation
 
 def sample(model, config, word, sigma, dset, char2idx, idx2char,
-           beam_size, max_len, device, print_probabs=False, start='START',
+           beam_size, max_len, device, start='START',
            use_head=True):
     """Perform sampling using the given model and config.
     If word is the integer 0, a random embedding is used."""
     input_embedding = get_embedding(config, word, sigma, device, dset)
+
+    # find closest glove word to the embedding
+    cos_sim = torch.nn.modules.distance.CosineSimilarity()
+    index = int(cos_sim(input_embedding.unsqueeze(0), dset.embed).argmax())
+    closest = dset.idx2word[index]
+
+
     use_head = False
-    if start != 'START' and len(start)>1:
+    if start != 'START' and len(start) > 1:
         out, input_embedding = pass_word(start[:-1], model, input_embedding, char2idx, device)
         start_c = start[-1]
         # print(start_c, start[:-1])
     else:
         start_c = start
-        use_head=True
+        use_head = True
     samples, probabs = sample_beam(model, input_embedding, char2idx, idx2char,
                                    use_head=use_head,
                                    k=beam_size, maxlen=max_len, start=start_c)
@@ -71,15 +78,7 @@ def sample(model, config, word, sigma, dset, char2idx, idx2char,
     if start != 'START':
         samples = [start+s for s in samples]
 
-    if print_probabs:
-        if word != 0:
-            print(f"Input word: {word}")
-
-        print(f"Word\tProbability")
-        for word_sample, probab in zip(samples, probabs):
-            print(f"{word_sample}\t{probab}")
-
-    return samples, probabs
+    return samples, probabs, closest
 
 # %%
 ex = Experiment('sampling')
@@ -111,28 +110,42 @@ def main(run_dir, epoch, beam_size, max_len, word, sigma,
     model = model.eval()
     _log.info(f"Loaded state dict from {path}")
 
-    dset = None
-    if word != 0:
-        dset, train_loader, val_loader = make_dataloaders(**{**config['dataset'],
-        'device':device}, _log=_log)
+    dset, train_loader, val_loader = make_dataloaders(**{**config['dataset'],
+                                                         'device':device},
+                                                      _log=_log)
     char2idx, idx2char = torch.load(config['dataset']['charidx_file'])
 
     print("sigma = 0:")
-    samples, probabs = sample(model, config, word, 0, dset, char2idx, idx2char,
-                              beam_size, max_len, device, print_probabs, start=start)
-    print(" ".join(samples))
+    samples, probabs, closest = sample(model, config, word, 0, dset, char2idx, idx2char,
+                                       beam_size, max_len, device, start=start)
+    print(f"Closest word: {closest}")
+    if print_probabs:
+        print(f"Word\tProbability")
+        for word_sample, probab in zip(samples, probabs):
+            print(f"{word_sample}\t{probab}")
+    else:
+        print(" ".join(samples))
+
     print(f"Word: {word}, sigma={sigma}")
     for i in range(num_samples):
-        samples, probabs = sample(model, config, word, sigma, dset, char2idx, idx2char,
-                                  beam_size, max_len, device, print_probabs, start=start)
-        print(" ".join(samples))
+        samples, probabs, closest = sample(model, config, word, sigma, dset, char2idx, idx2char,
+                                           beam_size, max_len, device, start=start)
+
+        print(f"Closest word: {closest}")
+        if print_probabs:
+            print(f"Word\tProbability")
+            for word_sample, probab in zip(samples, probabs):
+                print(f"{word_sample}\t{probab}")
+        else:
+            print(" ".join(samples))
+
         print()
 
 # Run using hydrogen or jupyter for easy sampling
 
 # # %%
 # from IPython.display import display, Markdown
-# run_dir = 'CharDecoderRNN\\2'
+# run_dir = 'trained_model'
 # epoch = 'latest'
 # beam_size = 10 # currently should be < 28
 # sigma = 1 # sigma of gaussian noise to add to embedding
@@ -141,36 +154,37 @@ def main(run_dir, epoch, beam_size, max_len, word, sigma,
 # num_samples = 10 # number of times to sample
 # print_probabs = False # whether to print beam search probabilities
 # device = 'cpu'
+# start = 'START'
 #
-# def dummy():
-#     pass
-# dummy.info = lambda x:None
+# import logging
+# log = logging.getLogger('sampling')
 #
 # # %%
 # config = read_config(run_dir)
-# model = make_model(**{**config['model'], 'device':device}, _log=dummy)
+# model = make_model(**{**config['model'], 'device':device}, _log=log)
 # path = get_model_path(run_dir, epoch)
 # model.load_state_dict(torch.load(path))
 # model = model.eval()
 #
 # # %%
 # dset, train_loader, val_loader = make_dataloaders(**{**config['dataset'],
-# 'device':device}, _log=dummy)
+# 'device':device}, _log=log)
 # char2idx, idx2char = torch.load(config['dataset']['charidx_file'])
 #
 # # %%
 # word = 'conceptual'
-# sigma = 0.3
+# sigma = 0.5
 # beam_size = 20
-#
 # # %%
 # out = f"Word: {word}, sigma={sigma}\n\n"
-# out += "sigma = 0  \n"
-# samples, probabs = sample(model, config, word, 0, dset, char2idx, idx2char,
-#                           beam_size, max_len, device, print_probabs)
+# out += "sigma = 0 "
+# samples, probabs, closest = sample(model, config, word, 0, dset, char2idx, idx2char,
+#                           beam_size, max_len, device, start=start)
+# out += f"Closest word: {closest}  \n"
 # out += " ".join(samples) + "\n\n"
 # for i in range(num_samples):
-#     samples, probabs = sample(model, config, word, sigma, dset, char2idx, idx2char,
-#                               beam_size, max_len, device, print_probabs)
+#     samples, probabs, closest = sample(model, config, word, sigma, dset, char2idx, idx2char,
+#                               beam_size, max_len, device, start=start)
+#     out += f"Closest word: {closest}  \n"
 #     out += " ".join(samples) + "\n\n"
 # display(Markdown(out))
