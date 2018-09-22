@@ -1,0 +1,4 @@
+sacred
+visdom
+pytorch-utils
+visdom-observer
