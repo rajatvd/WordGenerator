@@ -14,7 +14,7 @@ ex = Experiment(name="preprocess_glove_vectors")
 def config():
     """Main config for data preprocessing"""
 
-    glove_file = 'glove.6B/glove.6B.50d.txt' # filename of glove file (.txt)
+    glove_file = 'glove.6B/glove.6B.300d.txt' # filename of glove file (.txt)
     path, file = os.path.split(glove_file)
     name, ext = os.path.splitext(file)
     output_path = f'pickled_word_vecs/{name}' # output path for pickled files
