@@ -1,0 +1,37 @@
+{
+  "__doc__": "Config for lr scheduler",
+  "dataset": {
+    "__doc__": "Config for data source and loading",
+    "batch_size": 2048,
+    "charidx_file": "pickled_word_vecs/glove.6B.300d_chars.pkl",
+    "device": "cuda",
+    "num_workers": 0,
+    "val_split": 0.01,
+    "word2vec_file": "pickled_word_vecs/glove.6B.300d_words.pkl"
+  },
+  "epochs": 700,
+  "gamma": 0.3,
+  "lr": 0.001,
+  "milestones": [
+    150,
+    300,
+    450
+  ],
+  "model": {
+    "__doc__": "Config for model",
+    "char_count": 28,
+    "char_embedding_size": 300,
+    "device": "cuda",
+    "dropout": 0.0,
+    "embedding_to_hidden_activation": "relu",
+    "hidden_size": 1500,
+    "mode": "GRU",
+    "word_embedding_size": 300
+  },
+  "opt": "adam",
+  "save_every": 10,
+  "seed": 720539069,
+  "sigma": 0,
+  "start_epoch": 1,
+  "weight_decay": 0
+}
