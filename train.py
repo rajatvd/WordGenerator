@@ -66,7 +66,7 @@ def make_optimizer(model, lr, opt, weight_decay):
 def scheduler_config():
     """Config for lr scheduler"""
     milestones = [50, 100]
-    gamma = 0.5
+    gamma = 0.5 # factor to reduce lr by at each milestone
 
 @ex.capture
 def make_scheduler_callback(optimizer, milestones, gamma):
