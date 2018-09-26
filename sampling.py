@@ -50,12 +50,22 @@ def get_embedding(config, word, sigma, device='cpu', dset=None):
         embedding = dset[dset.word2idx[word]]['embedding']
         return embedding + perturbation
 
-def sample(model, config, word, sigma, dset, char2idx, idx2char,
+def sample(model, config, input, sigma, dset, char2idx, idx2char,
            beam_size, max_len, device, start='START',
            use_head=True):
     """Perform sampling using the given model and config.
-    If word is the integer 0, a random embedding is used."""
-    input_embedding = get_embedding(config, word, sigma, device, dset)
+    input can be one of three things:
+     - a word: the embedding of the word + noise will be used
+     - an embedding: the embedding + noise will be used
+     - the integer 0: a random embedding with given sigma will be used"""
+
+    if type(input)==int or type(input)==str:
+        input_embedding = get_embedding(config, input, sigma, device, dset)
+    else:
+        input_embedding = input
+        perturbation = sigma*torch.randn(config['model']['word_embedding_size'])
+        perturbation = perturbation.to(device)
+        input_embedding = input_embedding + perturbation
 
     # find closest glove word to the embedding
     cos_sim = torch.nn.modules.distance.CosineSimilarity()
@@ -172,11 +182,18 @@ def main(run_dir, epoch, beam_size, max_len, word, sigma,
 # char2idx, idx2char = torch.load(config['dataset']['charidx_file'])
 #
 # # %%
-# word = 'conceptual'
-# sigma = 0.5
+# word = 'harmony'
+# sigma = 0.2
 # beam_size = 20
+#
+#
 # # %%
-# out = f"Word: {word}, sigma={sigma}\n\n"
+# words = ['musical']
+# embeds = torch.stack([dset.embed[dset.word2idx[w]] for w in words])
+# word = embeds.mean(dim=0)
+#
+# # %%
+# out = f"Words: {words}, sigma={sigma}\n\n"
 # out += "sigma = 0 "
 # samples, probabs, closest = sample(model, config, word, 0, dset, char2idx, idx2char,
 #                           beam_size, max_len, device, start=start)
