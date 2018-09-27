@@ -14,30 +14,40 @@ class WordsDataset(Dataset):
     Dataset of words and their word embeddings.
     Also stores indexed versions of the words using character mappings.
     """
-    def __init__(self, word2vec_file, charidx_file, device='cpu',
+    def __init__(self, word2vec=None, charidx=None,
+                 word2vec_file=None, charidx_file=None, device='cpu',
                  _log=logging.getLogger('words_dataset')):
         """
-        Requires two pickled files as inputs.
+        word2vec and charidx are 2 tuples.
+        word2vec contains 3 elements:
+            word2idx mapping (dict),
+            idx2word mapping (dict),
+            a torch Tensor containing word vectors.
 
-        word2vec_file when read should be a tuple with 3 elements:
-        word2idx mapping (dict),
-        idx2word mapping (dict),
-        a torch Tensor containing word vectors.
-
-        charidx_file when read should be a tuple with 2 elements:
-        char2idx mapping (dict),
-        idx2char mapping (dict).
+        charidx contains 2 elements:
+            char2idx mapping (dict),
+            idx2char mapping (dict).
 
         The char2idx dictionary must have keys called 'START' and 'END' which
         denote the start and end of character sequences(words).
+
+
+        Can also provide file names which contain pickled versions of the above
+        two tuples. If both are provided, the filenames are ignored.
         """
 
-        self.word2idx, self.idx2word, self.embed = torch.load(word2vec_file)
+        if word2vec is not None:
+            self.word2idx, self.idx2word, self.embed = word2vec
+        else:
+            self.word2idx, self.idx2word, self.embed = torch.load(word2vec_file)
         self.embed = self.embed.to(device)
         self.embed.requires_grad = False
         _log.info(f"Loaded word2vec to {device}")
 
-        self.char2idx, self.idx2char = torch.load(charidx_file)
+        if charidx is not None:
+            self.char2idx, self.idx2char = charidx
+        else:
+            self.char2idx, self.idx2char = torch.load(charidx_file)
         _log.info("Loaded char2idx")
 
 
