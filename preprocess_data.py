@@ -7,6 +7,14 @@ import os
 
 import torch
 from sacred  import Experiment
+from torchnlp.word_to_vector import GloVe, CharNGram, FastText
+
+
+MAPPING = {
+    'glove':GloVe,
+    'char_n_gram':CharNGram,
+    'fast_text':FastText
+}
 
 ex = Experiment(name="preprocess_glove_vectors")
 
@@ -14,11 +22,28 @@ ex = Experiment(name="preprocess_glove_vectors")
 def config():
     """Main config for data preprocessing"""
 
-    glove_file = 'glove.6B/glove.6B.300d.txt' # filename of glove file (.txt)
+    glove_file = 'glove.6B/glove.6B.300d.txt' # optional filename of glove file (.txt)
     path, file = os.path.split(glove_file)
     name, ext = os.path.splitext(file)
     output_path = f'pickled_word_vecs/{name}' # output path for pickled files
 
+
+    word_vectors = 'glove' # one of 'glove', 'fast_text', 'char_n_gram'. Overrides glove_file
+    word_vectors_kwargs = {
+        'glove':{
+            'name':'6B',
+            'cache':'glove.6B/',
+            'dim':300,
+        },
+        'fast_text':{
+            'cache':'fast_text/',
+            'language':'en',
+            'aligned':True,
+        },
+        'char_n_gram':{
+            'cache':'char_n_gram/',
+        }
+    }
 
 
     lowercase = True # whether to include lowercase letters
@@ -81,15 +106,15 @@ def pickle_word_vecs(output_path, word_vectors_dict, letters, _log):
     """
     Filters the given word_vectors_dict to have words made only using the given
     letters.
-    Saves two files with names filepath_words.pkl and filepath_chars.pkl
+    Saves two files with names <output_path>_words.pkl and <output_path>_chars.pkl
     which contain the following:
 
-    filepath_words.pkl: a tuple of 3 elements
+    <output_path>_words.pkl: a tuple of 3 elements
         word2idx mapping (dict),
         idx2word mapping (dict),
         a torch Tensor containing word vectors.
 
-    filepath_chars.pkl: a tuple of 2 elements
+    <output_path>_chars.pkl: a tuple of 2 elements
         char2idx mapping (dict),
         idx2char mapping (dict).
     """
@@ -135,7 +160,13 @@ def pickle_word_vecs(output_path, word_vectors_dict, letters, _log):
     _log.info(f"Saved char mappings to {char_file}")
 
 @ex.automain
-def main(glove_file, output_path, letters):
+def main(glove_file, word_vectors, output_path, letters, _config):
     """Main function to preprocess data"""
-    word_vectors_dict = load_glove_model(glove_file)
+    # print(_config)
+    if word_vectors not in MAPPING.keys():
+        word_vectors_dict = load_glove_model(glove_file)
+    else:
+        w2v = MAPPING[word_vectors](**_config['word_vectors_kwargs'][word_vectors])
+        word_vectors_dict = {word:w2v.vectors[index] for word, index in w2v.stoi.items()}
+
     pickle_word_vecs(output_path, word_vectors_dict, letters)

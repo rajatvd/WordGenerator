@@ -1,6 +1,7 @@
 __pycache__
 .ipynb_checkpoints
 glove.6B
+char_n_gram
 pickled_word_vecs
 CharDecoderLSTM
 CharDecoderRNN

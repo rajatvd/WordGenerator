@@ -1,3 +1,4 @@
+pytorch-nlp
 sacred
 visdom
 pytorch-utils
