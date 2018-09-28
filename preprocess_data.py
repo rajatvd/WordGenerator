@@ -20,7 +20,8 @@ ex = Experiment(name="preprocess_glove_vectors")
 
 @ex.config
 def config():
-    """Main config for data preprocessing"""
+    """Main config for data preprocessing
+    char_n_gram currently not supported"""
 
     glove_file = 'glove.6B/glove.6B.300d.txt' # optional filename of glove file (.txt)
     path, file = os.path.split(glove_file)
