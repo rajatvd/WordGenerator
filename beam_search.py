@@ -110,26 +110,4 @@ def pass_word(word, model, input_embedding, char2idx, device, use_head=True):
     inp = pack([inp])
     out, hidden = model(input_embedding.unsqueeze(0), inp, use_head=use_head)
     return out, hidden
-
-# %%
-# import json
-# rundir = 'CharDecoderLSTM\\24'
-# with open(f'{rundir}\\config.json') as f:
-#     cfg = json.loads(f.read())
-#
-# cfg
-#
-# from model_lstm import make_model, model_ingredient
-# from numpy import *
-# def f():
-#     pass
-#
-# f.info = lambda x:None
-#
-# model = make_model(cfg['lstm_hidden_size'], cfg['char_count'],  cfg['char_embedding_size'], cfg['word_embedding_size'],cfg['embedding_to_hidden_activation'], 'cuda', f)
-#
-# model = model.eval()
-# model.load_state_dict(torch.load(f'{rundir}\\epoch595_03-09_0955_learning_rate0.0000_loss1.0509.statedict.pkl'))
-# char2idx, idx2char = torch.load(cfg['charidx_file'])
-#
-# sample_beam(model, 1*torch.randn(300).cuda(), char2idx, idx2char, k=20)
+    
