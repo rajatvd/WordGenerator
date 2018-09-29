@@ -30,6 +30,7 @@ This will download the glove word vectors and pickle them to be used for trainin
 
 # Sampling
 If you want to directly sample words from a pretrained network, just go ahead and run
+
 `python sampling.py with word=<your word>`
 
 The `sampling.py` script is used to generate words from a trained model. A pretrained set of weights are present in the `trained_model/` directory, along with the config used to train it.
