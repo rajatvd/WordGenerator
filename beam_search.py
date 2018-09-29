@@ -105,7 +105,7 @@ def sample_beam(model, input_embedding, char2idx, idx2char, k=5, maxlen=30,
 
 def pass_word(word, model, input_embedding, char2idx, device, use_head=True):
     """Pass a word through the given model using the input_embedding,
-    Returns the final output and hidden state"""
+    Returns the output and final hidden state"""
     inp = torch.LongTensor([char2idx['START']] + [char2idx[c] for c in word]).to(device)
     inp = pack([inp])
     out, hidden = model(input_embedding.unsqueeze(0), inp, use_head=use_head)
