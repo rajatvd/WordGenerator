@@ -20,6 +20,14 @@ All the scripts are `sacred` experiments, so they can be run as
 
 `python <script>.py with <config updates>`
 
+# Word embeddings
+
+First, get the GloVe vectors and preprocess them by running
+
+`python preprocess.py`
+
+This will download the glove word vectors and pickle them to be used for training and inference.
+
 # Sampling
 If you want to directly sample words from a pretrained network, just go ahead and run
 `python sampling.py with word=<your word>`
