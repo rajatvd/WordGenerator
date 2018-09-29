@@ -96,7 +96,6 @@ def probab_word(word, model, input_embedding, char2idx, device, use_head=True):
     probabs = out.data[range(len(expected)),expected]
     return probabs.prod()
 
-char2idx = dset.char2idx
 # %%
 ex = Experiment('sampling')
 
