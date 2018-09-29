@@ -40,7 +40,8 @@ Run `python sampling.py print_config` to see the different sampling parameters.
 # Train your own model
 Run `python train.py print_config` to get a list of config options for training your own model.
 
-To train your own model, make sure to have a `visdom` server running in the background at port `8097`. Just run `visdom` in a separate terminal before running the train script.
+To train your own model, make sure to have a `visdom` server running in the background at port `8097`. Just run `visdom` in a separate terminal before running the train script to start the server.
+
 
 
 
