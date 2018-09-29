@@ -72,11 +72,13 @@ def sample(model, config, input, sigma, dset, char2idx, idx2char,
     index = int(cos_sim(input_embedding.unsqueeze(0), dset.embed).argmax())
     closest = dset.idx2word[index]
 
-
     use_head = False
     if start != 'START':
         out, input_embedding = pass_word(start[:-1], model, input_embedding, char2idx, device)
         start_c = start[-1]
+    else:
+        use_head = True
+        start_c = 'START'
 
     samples, probabs = sample_beam(model, input_embedding, char2idx, idx2char,
                                    use_head=use_head,
