@@ -6,11 +6,11 @@ This is the code for my blog post on Generating Words from Meanings. It uses a c
 `pytorch 0.4.1`
 
 Also needs the following packages:  
-* `pytorch-nlp` - for getting word embeddings
-* `sacred` - keeping track of configs of training runs and easily writing scripts
-* `visdom` - live dynamic loss plots
-* `pytorch-utils` - for easily writing training code in pytorch
-* `visdom-observer` - interface between `sacred` and `visdom`
+* `pytorch-nlp` - for getting word embeddings [link](https://github.com/PetrochukM/PyTorch-NLP)
+* `sacred` - keeping track of configs of training runs and easily writing scripts [link](https://github.com/IDSIA/sacred)
+* `visdom` - live dynamic loss plots [link](https://github.com/facebookresearch/visdom)
+* `pytorch-utils` - for easily writing training code in pytorch [link](https://github.com/rajatvd/PytorchUtils)
+* `visdom-observer` - interface between `sacred` and `visdom` [link](https://github.com/rajatvd/VisdomObserver)
 
 Install these using:
 
@@ -26,7 +26,7 @@ First, get the GloVe vectors and preprocess them by running
 
 `python preprocess.py`
 
-This will download the glove word vectors and pickle them to be used for training and inference.
+This will download the GloVe word vectors and pickle them to be used for training and inference.
 
 # Sampling
 If you want to directly sample words from a pretrained network, just go ahead and run
