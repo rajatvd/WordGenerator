@@ -24,7 +24,7 @@ All the scripts are `sacred` experiments, so they can be run as
 
 First, get the GloVe vectors and preprocess them by running
 
-`python preprocess.py`
+`python preprocess_data.py`
 
 This will download the GloVe word vectors and pickle them to be used for training and inference.
 
