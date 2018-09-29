@@ -74,13 +74,10 @@ def sample(model, config, input, sigma, dset, char2idx, idx2char,
 
 
     use_head = False
-    if start != 'START' and len(start) > 1:
+    if start != 'START':
         out, input_embedding = pass_word(start[:-1], model, input_embedding, char2idx, device)
         start_c = start[-1]
-        # print(start_c, start[:-1])
-    else:
-        start_c = start
-        use_head = True
+
     samples, probabs = sample_beam(model, input_embedding, char2idx, idx2char,
                                    use_head=use_head,
                                    k=beam_size, maxlen=max_len, start=start_c)
@@ -90,6 +87,16 @@ def sample(model, config, input, sigma, dset, char2idx, idx2char,
 
     return samples, probabs, closest
 
+def probab_word(word, model, input_embedding, char2idx, device, use_head=True):
+    """Pass a word through the given model using the input_embedding, and find
+    the probability of that word being generated."""
+    out, hidden = pass_word(word, model, input_embedding, char2idx, device, use_head=True)
+    out = torch.softmax(out.data, dim=1)
+    expected = [char2idx[c] for c in word]+[char2idx['END']]
+    probabs = out.data[range(len(expected)),expected]
+    return probabs.prod()
+
+char2idx = dset.char2idx
 # %%
 ex = Experiment('sampling')
 
@@ -161,10 +168,9 @@ def main(run_dir, epoch, beam_size, max_len, word, sigma,
 # sigma = 1 # sigma of gaussian noise to add to embedding
 # word = 0 # input word embedding to use. if equal to integer 0, a random embedding will be used
 # max_len = 30 # maximum length of a sampled word
-# num_samples = 10 # number of times to sample
+# num_samples = 0 # number of times to sample
 # print_probabs = False # whether to print beam search probabilities
 # device = 'cpu'
-# start = 'START'
 #
 # import logging
 # log = logging.getLogger('sampling')
@@ -182,18 +188,18 @@ def main(run_dir, epoch, beam_size, max_len, word, sigma,
 # char2idx, idx2char = torch.load(config['dataset']['charidx_file'])
 #
 # # %%
-# word = 'harmony'
-# sigma = 0.2
+# word = 'destruction'
+# sigma = 0.0
 # beam_size = 20
+# start = 'd'
 #
+# # # %%
+# # words = ['fleeting']
+# # embeds = torch.stack([dset.embed[dset.word2idx[w]] for w in words])
+# # word = embeds.mean(dim=0)
 #
 # # %%
-# words = ['musical']
-# embeds = torch.stack([dset.embed[dset.word2idx[w]] for w in words])
-# word = embeds.mean(dim=0)
-#
-# # %%
-# out = f"Words: {words}, sigma={sigma}\n\n"
+# out = f"Words: {word}, sigma={sigma}\n\n"
 # out += "sigma = 0 "
 # samples, probabs, closest = sample(model, config, word, 0, dset, char2idx, idx2char,
 #                           beam_size, max_len, device, start=start)
@@ -204,4 +210,8 @@ def main(run_dir, epoch, beam_size, max_len, word, sigma,
 #                               beam_size, max_len, device, start=start)
 #     out += f"Closest word: {closest}  \n"
 #     out += " ".join(samples) + "\n\n"
+#
+# w = 'temple'
+# p = probab_word(w, model, dset.embed[dset.word2idx[word]], dset.char2idx, device)
+# out += f"Probability of {w} = {p}"
 # display(Markdown(out))
