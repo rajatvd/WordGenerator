@@ -110,7 +110,7 @@ def input_config():
     max_len = 30 # maximum length of a sampled word
     num_samples = 10 # number of times to sample
     print_probabs = False # whether to print beam search probabilities
-    start = 'START' # all sampled words will start with this
+    start = 'START' # all sampled words will be forced to start with this, use 'START' for no restriction on starting
     device = 'cpu'
 
 @ex.automain
