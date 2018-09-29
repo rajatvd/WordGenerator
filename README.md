@@ -1,5 +1,5 @@
-# Generating Words from Meanings
-This is the code for my blog post on Generating Words from Meanings. It uses a character level decoder RNN to convert a word embedding (which represents a meaning) into a word by sampling one character at a time.
+# Generating Words from Embeddings
+This is the code for my blog post on Generating Words from Embeddings. It uses a character level decoder RNN to convert a word embedding (which represents a meaning) into a word by sampling one character at a time.
 
 # Requirements
 `python 3.6`  
