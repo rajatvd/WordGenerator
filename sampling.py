@@ -107,7 +107,7 @@ def input_config():
     run_dir = 'trained_model'
     epoch = 'latest'
     beam_size = 20 # currently should be < 28
-    sigma = 0.5 # sigma of gaussian noise to add to embedding
+    sigma = 0.3 # sigma of gaussian noise to add to embedding
     word = 0 # input word embedding to use. if equal to integer 0, a random embedding will be used
     max_len = 30 # maximum length of a sampled word
     num_samples = 10 # number of times to sample
