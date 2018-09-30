@@ -57,7 +57,14 @@ def sample(model, config, input, sigma, dset, char2idx, idx2char,
     input can be one of three things:
      - a word: the embedding of the word + noise will be used
      - an embedding: the embedding + noise will be used
-     - the integer 0: a random embedding with given sigma will be used"""
+     - the integer 0: a random embedding with given sigma will be used
+
+    Returns
+     - beam of sampled words in decreasing order of probabilities
+     - a list of probabilities for these words
+     - the word in the vocabulary which is closest to the input embedding after
+        adding noise
+    """
 
     if type(input)==int or type(input)==str:
         input_embedding = get_embedding(config, input, sigma, device, dset)
@@ -169,7 +176,7 @@ def main(run_dir, epoch, beam_size, max_len, word, sigma,
 # sigma = 1 # sigma of gaussian noise to add to embedding
 # word = 0 # input word embedding to use. if equal to integer 0, a random embedding will be used
 # max_len = 30 # maximum length of a sampled word
-# num_samples = 0 # number of times to sample
+# num_samples = 10 # number of times to sample
 # print_probabs = False # whether to print beam search probabilities
 # device = 'cpu'
 #
@@ -189,10 +196,10 @@ def main(run_dir, epoch, beam_size, max_len, word, sigma,
 # char2idx, idx2char = torch.load(config['dataset']['charidx_file'])
 #
 # # %%
-# word = 'destruction'
-# sigma = 0.0
+# word = 'research'
+# sigma = 0.2
 # beam_size = 20
-# start = 'd'
+# start = 'START'
 #
 # # # %%
 # # words = ['fleeting']
@@ -200,7 +207,7 @@ def main(run_dir, epoch, beam_size, max_len, word, sigma,
 # # word = embeds.mean(dim=0)
 #
 # # %%
-# out = f"Words: {word}, sigma={sigma}\n\n"
+# out = f"Words: {word}, sigma={sigma}, start={start}\n\n"
 # out += "sigma = 0 "
 # samples, probabs, closest = sample(model, config, word, 0, dset, char2idx, idx2char,
 #                           beam_size, max_len, device, start=start)
@@ -214,5 +221,5 @@ def main(run_dir, epoch, beam_size, max_len, word, sigma,
 #
 # w = 'temple'
 # p = probab_word(w, model, dset.embed[dset.word2idx[word]], dset.char2idx, device)
-# out += f"Probability of {w} = {p}"
+# # out += f"Probability of {w} = {p}"
 # display(Markdown(out))
