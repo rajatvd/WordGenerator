@@ -1,4 +1,13 @@
-"""Run beam search sampling using a given rundir"""
+"""Run beam search sampling using a given rundir
+
+Prints the sampled words in the following format:
+
+Each line contains the beam of outputs for a particular embedding.
+
+Different lines correspond to different noise samples added to the input word
+embedding. The noise is gaussian with standard deviation sigma.
+
+"""
 # %%
 import os
 import json
