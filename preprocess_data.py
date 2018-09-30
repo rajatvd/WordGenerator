@@ -146,6 +146,10 @@ def pickle_word_vecs(output_path, word_vectors_dict, letters, _log):
         word_vecs[i] = filtered_w2v[word]
         i += 1
 
+
+    # make directory and save pickle files
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
+
     word_vec_file = f"{output_path}_words.pkl"
     torch.save((word2idx, idx2word, word_vecs), word_vec_file)
 
