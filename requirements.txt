@@ -1,3 +1,4 @@
+torchvision
 pytorch-nlp
 sacred
 visdom
