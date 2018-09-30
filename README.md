@@ -5,7 +5,7 @@ To get straight into sampling words, run these commands:
 
 ```
 conda create -n word_generator python=3.6  
-activate word_generator
+source activate word_generator
 git clone https://github.com/rajatvd/WordGenerator.git  
 cd WordGenerator  
 pip install -r requirements.txt   
