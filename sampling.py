@@ -7,6 +7,9 @@ Each line contains the beam of outputs for a particular embedding.
 Different lines correspond to different noise samples added to the input word
 embedding. The noise is gaussian with standard deviation sigma.
 
+The word with the closest GloVe vector (minimum CosineSimilarity) is also
+printed along with each line.
+
 """
 # %%
 import os
