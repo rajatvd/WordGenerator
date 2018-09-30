@@ -3,13 +3,15 @@ This is the code for my blog post on Generating Words from Embeddings. It uses a
 
 To get straight into sampling words, run these commands:
 
-  conda create -n word_generator python=3.6  
-  activate word_generator
-  git clone https://github.com/rajatvd/WordGenerator.git  
-  cd WordGenerator  
-  pip install -r requirements.txt   
-  python preprocess_data.py  
-  python sampling.py with word=musical sigma=0.2  
+```
+conda create -n word_generator python=3.6  
+activate word_generator
+git clone https://github.com/rajatvd/WordGenerator.git  
+cd WordGenerator  
+pip install -r requirements.txt   
+python preprocess_data.py  
+python sampling.py with word=musical sigma=0.2
+```
 
 # Requirements
 `python 3.6`  
