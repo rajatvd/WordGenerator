@@ -1,5 +1,5 @@
 # Generating Words from Embeddings
-This is the code for my blog post on Generating Words from Embeddings. It uses a character level decoder RNN to convert a word embedding (which represents a meaning) into a word by sampling one character at a time.
+This is the code for my blog post on [Generating Words from Embeddings]. It uses a character level decoder RNN to convert a word embedding (which represents a meaning) into a word by sampling one character at a time.
 
 To get straight into sampling words, run these commands:
 
