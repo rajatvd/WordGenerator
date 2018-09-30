@@ -4,7 +4,7 @@ This is the code for my blog post on Generating Words from Embeddings. It uses a
 To get straight into sampling words, run these commands:
 
 ```
-conda create -n word_generator python=3.6  
+conda create -y -n word_generator python=3.6  
 source activate word_generator
 git clone https://github.com/rajatvd/WordGenerator.git  
 cd WordGenerator  
