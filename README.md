@@ -50,7 +50,7 @@ If you want to directly sample words from a pretrained network, just go ahead an
 
 `python sampling.py with word=musical sigma=0.2`
 
-You can change the word and _sigma_ to sample for different embeddings. The sampling script also has other parameters like start characters
+You can change the word and _sigma_ to sample for different embeddings. The sampling script also has other parameters like start characters and beam size.
 
 The `sampling.py` script is used to generate words from a trained model. A pretrained set of weights are present in the `trained_model/` directory, along with the config used to train it.
 
