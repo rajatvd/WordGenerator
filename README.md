@@ -13,7 +13,7 @@ python preprocess_data.py
 python sampling.py with word=musical sigma=0.2
 ```
 
-This works only for Linux systems. For Windows, you have to manually install the pytorch 0.4.1 before running the scripts. Use this command:
+This works only for Linux systems. For Windows, you have to manually install pytorch 0.4.1 before running the scripts. Use this command:
 
 `pip3 install http://download.pytorch.org/whl/cu90/torch-0.4.1-cp36-cp36m-win_amd64.whl`
 
