@@ -61,6 +61,10 @@ Run `python train.py print_config` to get a list of config options for training 
 
 To train your own model, make sure to have a `visdom` server running in the background at port `8097`. Just run `visdom` in a separate terminal before running the train script to start the server.
 
+To train the same model I used for generating the words in the post, run this command:
+
+`python train.py with trained_model/config.json`
+
 
 
 
