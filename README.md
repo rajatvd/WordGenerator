@@ -56,6 +56,23 @@ The `sampling.py` script is used to generate words from a trained model. A pretr
 
 Run `python sampling.py print_config` to see the different sampling parameters.
 
+Examples of words generated. The embedding of the input word + noise is passed into the GRU model to generate the words.
+
+|Input word| Generated words|
+|---|---|
+| musical    | melodynamic, melodimentary, songrishment  |
+| war  | demutualization, armision|
+| intelligence  | technicativeness,   intelimetry  |
+| intensity  | miltrality, amphasticity   |
+| harmony   | symphthism, ordenity, whistlery, hightonial|    
+| conceptual |  stemanological, mathedrophobic|
+| mathematics   | tempologistics, mathdom    |
+| research   | scienting  |
+| befuddled   | badmanished, stummied, stumpingly   |
+| dogmatic   | doctivistic, ordionic, prescribitious, prefactional, pastological    |
+
+
+
 # Train your own model
 Run `python train.py print_config` to get a list of config options for training your own model.
 
