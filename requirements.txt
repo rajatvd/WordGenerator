@@ -1,4 +1,4 @@
-torchvision
+torch==1.0.0
 pytorch-nlp
 sacred
 visdom
