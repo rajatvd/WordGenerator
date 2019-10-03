@@ -1,15 +1,17 @@
 # Generating Words from Embeddings
 This is the code for my blog post on [Generating Words from Embeddings](https://rajatvd.github.io/Generating-Words-From-Embeddings/). It uses a character level decoder RNN to convert a word embedding (which represents a meaning) into a word by sampling one character at a time.
 
-To get straight into sampling words, run these commands:
+Play around with sampling words in this [colab notebook](https://colab.research.google.com/drive/1f_vW0k8YyoyiPIgX7eHP_a-8T3Zepat3).
+
+To get the code working on your local machine, run these commands:
 
 ```
-conda create -y -n word_generator python=3.6  
+conda create -y -n word_generator python=3.6
 source activate word_generator
-git clone https://github.com/rajatvd/WordGenerator.git  
-cd WordGenerator  
-pip install -r requirements.txt   
-python preprocess_data.py  
+git clone https://github.com/rajatvd/WordGenerator.git
+cd WordGenerator
+pip install -r requirements.txt
+python preprocess_data.py
 python sampling.py with word=musical sigma=0.2
 ```
 
@@ -19,10 +21,10 @@ This works only for Linux systems. For Windows, you have to manually install pyt
 
 
 # Requirements
-`python 3.6`  
+`python 3.6`
 `pytorch 0.4.1`
 
-Also needs the following packages:  
+Also needs the following packages:
 * `pytorch-nlp` - for getting word embeddings [link](https://github.com/PetrochukM/PyTorch-NLP)
 * `sacred` - keeping track of configs of training runs and easily writing scripts [link](https://github.com/IDSIA/sacred)
 * `visdom` - live dynamic loss plots [link](https://github.com/facebookresearch/visdom)
@@ -64,7 +66,7 @@ Examples of words generated. The embedding of the input word + noise is passed i
 | war  | demutualization, armision|
 | intelligence  | technicativeness,   intelimetry  |
 | intensity  | miltrality, amphasticity   |
-| harmony   | symphthism, ordenity, whistlery, hightonial|    
+| harmony   | symphthism, ordenity, whistlery, hightonial|
 | conceptual |  stemanological, mathedrophobic|
 | mathematics   | tempologistics, mathdom    |
 | research   | scienting  |
