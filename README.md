@@ -20,7 +20,7 @@ This works only for Linux systems. For Windows, remove `source`, and just use `a
 
 # Requirements
 `python 3.6`
-`pytorch 1.2.0`
+`pytorch 1.0.0`
 
 Also needs the following packages:
 * `pytorch-nlp` - for getting word embeddings [link](https://github.com/PetrochukM/PyTorch-NLP)

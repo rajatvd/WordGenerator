@@ -1,5 +1,5 @@
 --find-links https://download.pytorch.org/whl/torch_stable.html
-torch==1.2.0+cpu
+torch==1.0.0
 pytorch-nlp
 sacred
 visdom
