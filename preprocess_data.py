@@ -6,55 +6,56 @@ import string
 import os
 
 import torch
-from sacred  import Experiment
+from sacred import Experiment
 from torchnlp.word_to_vector import GloVe, CharNGram, FastText
 
 
 MAPPING = {
-    'glove':GloVe,
-    'char_n_gram':CharNGram,
-    'fast_text':FastText
+    'glove': GloVe,
+    'char_n_gram': CharNGram,
+    'fast_text': FastText
 }
 
 ex = Experiment(name="preprocess_glove_vectors")
+
 
 @ex.config
 def config():
     """Main config for data preprocessing
     char_n_gram currently not supported"""
 
-    glove_file = 'glove.6B/glove.6B.300d.txt' # optional filename of glove file (.txt)
+    # optional filename of glove file (.txt)
+    glove_file = 'glove.6B/glove.6B.300d.txt'
     path, file = os.path.split(glove_file)
     name, ext = os.path.splitext(file)
-    output_path = f'pickled_word_vecs/{name}' # output path for pickled files
+    output_path = f'pickled_word_vecs/{name}'  # output path for pickled files
 
-
-    word_vectors = 'glove' # one of 'glove', 'fast_text', 'char_n_gram'. Overrides glove_file
+    word_vectors = 'glove'  # one of 'glove', 'fast_text', 'char_n_gram'. Overrides glove_file
     word_vectors_kwargs = {
-        'glove':{
-            'name':'6B',
-            'cache':'glove.6B/',
-            'dim':300,
+        'glove': {
+            'name': '6B',
+            'cache': 'glove.6B/',
+            'dim': 300,
         },
-        'fast_text':{
-            'cache':'fast_text/',
-            'language':'en',
-            'aligned':True,
+        'fast_text': {
+            'cache': 'fast_text/',
+            'language': 'en',
+            'aligned': True,
         },
-        'char_n_gram':{
-            'cache':'char_n_gram/',
+        'char_n_gram': {
+            'cache': 'char_n_gram/',
         }
     }
 
+    lowercase = True  # whether to include lowercase letters
+    uppercase = False  # whether to include uppercase letters
+    chars = ''  # characters to add to lowercase, uppercase if included
 
-    lowercase = True # whether to include lowercase letters
-    uppercase = False # whether to include uppercase letters
-    chars = '' # characters to add to lowercase, uppercase if included
-
-    letters = chars # final set of letters used to filter words
+    letters = chars  # final set of letters used to filter words
 
     letters += (string.ascii_lowercase if lowercase else '')
     letters += (string.ascii_uppercase if uppercase else '')
+
 
 @ex.capture
 def load_glove_model(glove_file, _log):
@@ -87,6 +88,7 @@ def remove_duplicate_chars(letters):
 # letters = "abcabcdeffffghu"
 # letters = remove_duplicate_chars(letters=letters)
 
+
 def filter_words(word_vectors_dict, letters):
     """
     Remove words from the word_vectors_dict which contain characters not
@@ -94,13 +96,14 @@ def filter_words(word_vectors_dict, letters):
     """
     out = {}
     for word, vec in word_vectors_dict.items():
-        if re.match(r'^['+letters+r']+$', word):
+        if re.match(r'^[' + letters + r']+$', word):
             out[word] = vec
 
     return out
 
 # filted = filter_words(w2v, letters)
 # len(filted)
+
 
 @ex.capture
 def pickle_word_vecs(output_path, word_vectors_dict, letters, _log):
@@ -130,7 +133,6 @@ def pickle_word_vecs(output_path, word_vectors_dict, letters, _log):
     # get words in sorted order
     words = sorted(list(filtered_w2v.keys()))
 
-
     word_count = len(words)
     embedding_dim = len(word_vectors_dict[words[0]])
 
@@ -145,7 +147,6 @@ def pickle_word_vecs(output_path, word_vectors_dict, letters, _log):
         idx2word[i] = word
         word_vecs[i] = filtered_w2v[word]
         i += 1
-
 
     # make directory and save pickle files
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
@@ -164,6 +165,7 @@ def pickle_word_vecs(output_path, word_vectors_dict, letters, _log):
 
     _log.info(f"Saved char mappings to {char_file}")
 
+
 @ex.automain
 def main(glove_file, word_vectors, output_path, letters, _config):
     """Main function to preprocess data"""
@@ -171,7 +173,9 @@ def main(glove_file, word_vectors, output_path, letters, _config):
     if word_vectors not in MAPPING.keys():
         word_vectors_dict = load_glove_model(glove_file)
     else:
-        w2v = MAPPING[word_vectors](**_config['word_vectors_kwargs'][word_vectors])
-        word_vectors_dict = {word:w2v.vectors[index] for word, index in w2v.stoi.items()}
+        w2v = MAPPING[word_vectors](
+            **_config['word_vectors_kwargs'][word_vectors])
+        word_vectors_dict = {word: w2v.vectors[index]
+                             for word, index in w2v.token_to_index.items()}
 
     pickle_word_vecs(output_path, word_vectors_dict, letters)
