@@ -15,14 +15,12 @@ python preprocess_data.py
 python sampling.py with word=musical sigma=0.2
 ```
 
-This works only for Linux systems. For Windows, you have to manually install pytorch 0.4.1 before running the scripts. Use this command:
-
-`pip3 install http://download.pytorch.org/whl/cu90/torch-0.4.1-cp36-cp36m-win_amd64.whl`
+This works only for Linux systems. For Windows, remove `source`, and just use `activate word_generator` in the second line.
 
 
 # Requirements
 `python 3.6`
-`pytorch 0.4.1`
+`pytorch 1.2.0`
 
 Also needs the following packages:
 * `pytorch-nlp` - for getting word embeddings [link](https://github.com/PetrochukM/PyTorch-NLP)
